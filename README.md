@@ -1,2 +1,2 @@
 # atlas
-> Packet tracer with a visual Terminal User Interface
+> Visual Packet tracer with a Terminal User Interface
