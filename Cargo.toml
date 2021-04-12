@@ -8,5 +8,5 @@ edition = "2018"
 
 [dependencies]
 # TUI
-tui = "0.13"
+tui = "0.14.0"
 termion = "1.5"
