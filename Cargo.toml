@@ -10,3 +10,5 @@ edition = "2018"
 # TUI
 tui = "0.14.0"
 termion = "1.5"
+# Tracing
+libtraceroute = "0.1.0"
