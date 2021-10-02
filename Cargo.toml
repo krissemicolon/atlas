@@ -11,7 +11,7 @@ rustflags = ["-C", "target-cpu=native"]
 
 [dependencies]
 # TUI
-tui = "0.14.0"
+tui = "0.16.0"
 termion = "1.5"
 # Tracing
 libtraceroute = "0.1.0"
