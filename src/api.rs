@@ -1,7 +1,7 @@
 use std::io::{stdout, Write};
 use curl::easy::Easy;
 
-pub fn api(host: &str) -> Vec<u8> {
+pub fn get_geo_from_host(host: &str) -> Vec<u8> {
     let mut easy = Easy::new();
     let mut cords = Vec::new();
     let url = format!("http://ip-api.com/line/{}?fields=lat,lon", host);
@@ -17,5 +17,5 @@ pub fn api(host: &str) -> Vec<u8> {
         transfer.perform().unwrap();
     }
 
-    return cords;
+    cords
 }

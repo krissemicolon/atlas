@@ -3,7 +3,7 @@ name = "atlas"
 description = "Visual Packet tracer with a Terminal User Interface"
 license = "GPLv3"
 version = "0.1.0"
-authors = ["krissemicolon <krissemicolon@gmail.com>"]
+authors = ["krissemicolon <kris@krishuber.xyz>"]
 edition = "2018"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -12,9 +12,10 @@ edition = "2018"
 rustflags = ["-C", "target-cpu=native"]
 
 [dependencies]
-# TUI
+libc = "0.2.103"
+rand = "0.8.4"
+socket = "0.0.7"
+time = "0.1.25"
 tui = "0.16.0"
 termion = "1.5"
-# Tracing
-libtraceroute = "0.1.0"
 curl = "0.4.39"
