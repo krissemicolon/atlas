@@ -2,19 +2,11 @@ use std::io;
 use std::env;
 use std::net::{SocketAddr, ToSocketAddrs};
 
-use termion::raw::IntoRawMode;
-use tui::Terminal;
-use tui::backend::TermionBackend;
-use tui::widgets::{Widget, Block, Borders};
-use tui::widgets::canvas::*;
-use tui::layout::{Layout, Constraint, Direction};
-use tui::style::Color;
-
 mod api;
+mod tui;
 mod tracer;
 
-// TODO: Modularize
-fn main() -> Result<(), io::Error> {
+fn main() {
     // let mut args = env::args();
     // let ip: String = args.nth(1).unwrap() + ":0";
 
@@ -32,41 +24,21 @@ fn main() -> Result<(), io::Error> {
     println!("Vec: {:?}", coords_vec);
 
     // trace
-    let mut hosts: Vec<SocketAddr> = Vec::new();
-    let mut i: usize = 0;
-    for trace_result in tracer::execute(format!("{}:0", host)).unwrap() {
-        match trace_result {
-            Ok(res) => hosts.push(res.host),
-            Err(e)  => println!("Error Executing Traceroute: {}", e),
-        }
-        println!("Host: {}", hosts[i]);
+    // let mut hosts: Vec<SocketAddr> = Vec::new();
+    // let mut i: usize = 0;
+    // for trace_result in tracer::execute(format!("{}:0", host)).unwrap() {
+    //     match trace_result {
+    //         Ok(res) => hosts.push(res.host),
+    //         Err(e)  => println!("Error Executing Traceroute: {}", e),
+    //     }
+    //     println!("Host: {}", hosts[i]);
 
-        i += 1;
-    }
+    //     i += 1;
+    // }
 
     // tui
-    let stdout = io::stdout().into_raw_mode()?;
-    let backend = TermionBackend::new(stdout);
-    let mut terminal = Terminal::new(backend)?;
-    terminal.draw(|f| {
-        let size = f.size();
-        let canv = Canvas::default()
-            .x_bounds([-180.0, 180.0])
-            .y_bounds([-90.0, 90.0])
-            .paint(|ctx| {
-                ctx.draw(&Map {
-                    resolution: MapResolution::High,
-
-                    color: Color::White
-                });
-                ctx.draw(&Points {
-                    coords: &[(*lon, *lat)],
-
-                    color: Color::Red,
-                });
-            });
-
-        // f.render_widget(canv, size);
-    })?;
-    Ok(())
+    // TODO: Map Override
+    let mut atlas_tui = tui::TUI::new().unwrap();
+    // atlas_tui.draw_map();
+    atlas_tui.draw_dot(&lat, &lon);
 }
