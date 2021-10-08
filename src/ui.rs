@@ -40,7 +40,7 @@ impl TUI {
         Ok(())
     }
 
-    pub fn draw_dot(&mut self, lat: &f64, lon: &f64) -> Result<(), std::io::Error> {
+    pub fn draw_dot(&mut self, lat: &f64, lon: &f64, color: &Color) -> Result<(), std::io::Error> {
         self.term.draw(|f| {
             let size = f.size();
             let canv = Canvas::default()
@@ -55,7 +55,7 @@ impl TUI {
                     ctx.draw(&Points {
                         coords: &[(*lon, *lat)],
 
-                        color: Color::Red,
+                        color: *color,
                     });
                 });
 
@@ -63,4 +63,28 @@ impl TUI {
         })?;
         Ok(())
     }
+
+    // pub fn draw_result(&mut self, coords: &Vec<(f64, f64)>) -> Result<(), std::io::Error> {
+    //     self.term.draw(|f| {
+    //         let size = f.size();
+    //         let canv = Canvas::default()
+    //             .x_bounds([-180.0, 180.0])
+    //             .y_bounds([-90.0, 90.0])
+    //             .paint(|ctx| {
+    //                 ctx.draw(&Map {
+    //                     resolution: MapResolution::High,
+
+    //                     color: Color::White
+    //                 });
+    //                 for c in coords {
+    //                     ctx.draw(&Points {coords: *[c], color: Color::Red});
+    //                     // ctx.draw(&Line   {x1: , color: Color::Yellow})
+    //                 }
+    //             });
+
+    //         f.render_widget(canv, size);
+    //     })?;
+    //     Ok(())
+    // }
+
 }

@@ -1,44 +1,74 @@
 use std::io;
 use std::env;
 use std::net::{SocketAddr, ToSocketAddrs};
+use std::{thread, time};
+use tui::style::Color;
 
 mod api;
-mod tui;
+mod ui;
 mod tracer;
 
 fn main() {
+    // get host
+    // ------------
     // let mut args = env::args();
-    // let ip: String = args.nth(1).unwrap() + ":0";
-
-    // geolookup
+    // let ip: String = args.nth(1).unwrap();
     let host = String::from("212.111.40.13");
-    let coords_asciivector = api::get_geo_from_host(&host);
-    let coords_s = String::from_utf8_lossy(&coords_asciivector);
-    let coords_vec: Vec<&str> = coords_s.split("\n").collect();
-    let lat = &coords_vec[0].parse::<f64>().unwrap();
-    let lon = &coords_vec[1].parse::<f64>().unwrap();
 
-    println!("lat: {}", lat);
-    println!("lon: {}", lon);
-
-    println!("Vec: {:?}", coords_vec);
+    // init tui
+    let mut atlas_tui = ui::TUI::new().unwrap();
+    // draw map
+    atlas_tui.draw_map();
 
     // trace
-    // let mut hosts: Vec<SocketAddr> = Vec::new();
-    // let mut i: usize = 0;
-    // for trace_result in tracer::execute(format!("{}:0", host)).unwrap() {
-    //     match trace_result {
-    //         Ok(res) => hosts.push(res.host),
-    //         Err(e)  => println!("Error Executing Traceroute: {}", e),
-    //     }
-    //     println!("Host: {}", hosts[i]);
+    let mut hosts: Vec<String> = Vec::new();
+    let mut coords: Vec<(f64, f64)> = Vec::new();
+    let mut i: usize = 0;
 
-    //     i += 1;
-    // }
+    for trace_result in tracer::execute(format!("{}:0", host)).unwrap() {
+        match trace_result {
+            Ok(res) => hosts.push(res.host.to_string()),
+            Err(e)  => panic!("Error Executing Traceroute: {}", e),
+        }
 
-    // tui
-    // TODO: Map Override
-    let mut atlas_tui = tui::TUI::new().unwrap();
-    // atlas_tui.draw_map();
-    atlas_tui.draw_dot(&lat, &lon);
+        // -":0"
+        hosts[i].pop();
+        hosts[i].pop();
+
+        // geolookup
+        let coords_asciivector = api::get_geo_from_host(&hosts[i]);
+        let coords_s = String::from_utf8_lossy(&coords_asciivector);
+        let coords_vec: Vec<&str> = coords_s.split("\n").collect();
+
+        let lat = match &coords_vec[0].parse::<f64>() {
+            Ok(o)  => *o,
+            Err(_) => {
+                i += 1;
+                continue;
+            },
+        };
+
+        let lon = match &coords_vec[1].parse::<f64>() {
+            Ok(o)  => *o,
+            Err(_) => {
+                i += 1;
+                continue;
+            },
+        };
+
+        coords.push((lat, lon));
+
+        // draw dot
+        if hosts[i] != host {
+            atlas_tui.draw_dot(&lat, &lon, &Color::Magenta);
+        } else {
+            atlas_tui.draw_dot(&lat, &lon, &Color::Red);
+            thread::sleep(time::Duration::from_secs(4));
+        }
+
+        thread::sleep(time::Duration::from_secs(1));
+
+        i += 1;
+    }
+
 }
