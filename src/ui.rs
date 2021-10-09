@@ -10,14 +10,18 @@ use tui::layout::{Layout, Constraint, Direction};
 use tui::style::Color;
 
 // #[derive(Copy)]
-pub struct TUI {
+pub struct TUI<'a> {
     term: Terminal<TermionBackend<Stdout>>,
+    pub points: Vec<Points<'a>>,
+    pub lines: Vec<Line>,
 }
 
-impl TUI {
+impl TUI<'_> {
     pub fn new() -> Result<Self, std::io::Error> {
         Ok(Self {
             term: Terminal::new(TermionBackend::new(io::stdout()))?,
+            points: Vec::new(),
+            lines: Vec::new(),
         })
     }
 
@@ -64,27 +68,29 @@ impl TUI {
         Ok(())
     }
 
-    // pub fn draw_result(&mut self, coords: &Vec<(f64, f64)>) -> Result<(), std::io::Error> {
-    //     self.term.draw(|f| {
-    //         let size = f.size();
-    //         let canv = Canvas::default()
-    //             .x_bounds([-180.0, 180.0])
-    //             .y_bounds([-90.0, 90.0])
-    //             .paint(|ctx| {
-    //                 ctx.draw(&Map {
-    //                     resolution: MapResolution::High,
+    pub fn draw_result(&mut self) -> Result<(), std::io::Error> {
+        self.term.draw(|f| {
+            let size = f.size();
+            let canv = Canvas::default()
+                .x_bounds([-180.0, 180.0])
+                .y_bounds([-90.0, 90.0])
+                .paint(|ctx| {
+                    ctx.draw(&Map {
+                        resolution: MapResolution::High,
 
-    //                     color: Color::White
-    //                 });
-    //                 for c in coords {
-    //                     ctx.draw(&Points {coords: *[c], color: Color::Red});
-    //                     // ctx.draw(&Line   {x1: , color: Color::Yellow})
-    //                 }
-    //             });
+                        color: Color::White
+                    });
+                    for p in &self.points {
+                        ctx.draw(p);
+                    }
+                    for l in &self.lines {
+                        ctx.draw(l);
+                    }
+                });
 
-    //         f.render_widget(canv, size);
-    //     })?;
-    //     Ok(())
-    // }
+            f.render_widget(canv, size);
+        })?;
+        Ok(())
+    }
 
 }

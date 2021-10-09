@@ -3,6 +3,7 @@ use std::env;
 use std::net::{SocketAddr, ToSocketAddrs};
 use std::{thread, time};
 use tui::style::Color;
+use tui::widgets::canvas::*;
 
 mod api;
 mod ui;
@@ -22,7 +23,6 @@ fn main() {
 
     // trace
     let mut hosts: Vec<String> = Vec::new();
-    let mut coords: Vec<(f64, f64)> = Vec::new();
     let mut i: usize = 0;
 
     for trace_result in tracer::execute(format!("{}:0", host)).unwrap() {
@@ -40,7 +40,7 @@ fn main() {
         let coords_s = String::from_utf8_lossy(&coords_asciivector);
         let coords_vec: Vec<&str> = coords_s.split("\n").collect();
 
-        let lat = match &coords_vec[0].parse::<f64>() {
+        let lat: f64 = match &coords_vec[0].parse::<f64>() {
             Ok(o)  => *o,
             Err(_) => {
                 i += 1;
@@ -48,7 +48,7 @@ fn main() {
             },
         };
 
-        let lon = match &coords_vec[1].parse::<f64>() {
+        let lon: f64 = match &coords_vec[1].parse::<f64>() {
             Ok(o)  => *o,
             Err(_) => {
                 i += 1;
@@ -56,15 +56,16 @@ fn main() {
             },
         };
 
-        coords.push((lat, lon));
-
-        // draw dot
+        // draw to ui
         if hosts[i] != host {
-            atlas_tui.draw_dot(&lat, &lon, &Color::Magenta);
+            atlas_tui.points.push(Points {coords: &[(*lon, *lat)], color: Color::Magenta});
+            // atlas_tui.lines.push(&Lines {coords: &[(*lon, *lat)], color: Color::Magenta});
         } else {
-            atlas_tui.draw_dot(&lat, &lon, &Color::Red);
+            atlas_tui.points.push(Points {coords: &[(*lon, *lat)], color: Color::Red});
             thread::sleep(time::Duration::from_secs(4));
         }
+
+        atlas_tui.draw_result();
 
         thread::sleep(time::Duration::from_secs(1));
 
