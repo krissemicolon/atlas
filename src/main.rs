@@ -17,6 +17,7 @@ fn main() {
     let host = String::from("212.111.40.13");
 
     // init tui
+    let mut atlas_canv = Canvas::default();
     let mut atlas_tui = ui::TUI::new().unwrap();
     // draw map
     atlas_tui.draw_map();
@@ -58,14 +59,12 @@ fn main() {
 
         // draw to ui
         if hosts[i] != host {
-            atlas_tui.points.push(Points {coords: &[(*lon, *lat)], color: Color::Magenta});
+            atlas_tui.draw_dot(&lat, &lon, Color::Magenta);
             // atlas_tui.lines.push(&Lines {coords: &[(*lon, *lat)], color: Color::Magenta});
         } else {
-            atlas_tui.points.push(Points {coords: &[(*lon, *lat)], color: Color::Red});
+            atlas_tui.draw_dot(&lat, &lon, Color::Red);
             thread::sleep(time::Duration::from_secs(4));
         }
-
-        atlas_tui.draw_result();
 
         thread::sleep(time::Duration::from_secs(1));
 
