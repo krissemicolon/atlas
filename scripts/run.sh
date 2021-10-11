@@ -1,3 +1,3 @@
 #!/bin/sh
 
-clear && cargo build && clear && ./target/debug/atlas
+clear && cargo build && clear && ./target/debug/atlas $1

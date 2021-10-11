@@ -12,9 +12,14 @@ mod tracer;
 fn main() {
     // get host
     // ------------
-    // let mut args = env::args();
-    // let ip: String = args.nth(1).unwrap();
-    let host = String::from("212.111.40.13");
+    let mut args = env::args();
+    let host =  match args.nth(1) {
+        Some(o)   => o,
+        None             => {
+            println!("Usage: atlas <ip>");
+            std::process::exit(1);
+        },
+    };
 
     // init tui
     let mut atlas_tui = ui::TUI::new().unwrap();
@@ -23,6 +28,7 @@ fn main() {
 
     // trace
     let mut hosts: Vec<String> = Vec::new();
+    let mut coords: Vec<(f64, f64)> = Vec::new();
     let mut i: usize = 0;
 
     for trace_result in tracer::execute(format!("{}:0", host)).unwrap() {
@@ -56,18 +62,13 @@ fn main() {
             },
         };
 
-        // draw to ui
-        if hosts[i] != host {
-            atlas_tui.draw_dot(&lat, &lon, &Color::Magenta);
-            // atlas_tui.lines.push(&Lines {coords: &[(*lon, *lat)], color: Color::Magenta});
-        } else {
-            atlas_tui.draw_dot(&lat, &lon, &Color::Red);
-            thread::sleep(time::Duration::from_secs(4));
-        }
+        coords.push((lon, lat));
 
-        thread::sleep(time::Duration::from_secs(1));
+        // draw to ui
+        atlas_tui.draw_result(&coords).unwrap();
 
         i += 1;
     }
 
+    thread::sleep(time::Duration::from_secs(100));
 }
